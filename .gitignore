@@ -1,0 +1,12 @@
+# dependencies
+/node_modules
+
+# production
+/build
+
+# local env files
+.env*.local
+.env
+
+#en dev
+./routes/offerPutDel.routes.js
