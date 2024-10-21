@@ -40,11 +40,15 @@ router.post("/payment", isAuthenticated, fileUpload(), async (req, res) => {
       // console.log("product_price /payment", product_price);
       // console.log("product_price === Number(offers.product_price).toFixed(2)");
       try {
+        // const paymentMethodDomain = await stripe.paymentMethodDomains.create(
+        //   {}
+        // );
         const paymentIntent = await stripe.paymentIntents.create({
           //montant transaction
           amount: amount,
           currency: "eur",
           description: product_title,
+          domain_name: "https://vintaid.netlify.app/",
         });
         console.log("paymentIntent in /payment:", paymentIntent);
         if (paymentIntent.client_secret) {
