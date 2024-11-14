@@ -13,32 +13,36 @@ const Transactions = require("../../models/Transactions.js");
 
 router.post("/payment", isAuthenticated, fileUpload(), async (req, res) => {
   console.log("je suis sur la route /payment");
-  // console.log("req.user in /payment:", req.user);
+  console.log("req.user in /payment:", req.user);
+  console.log("req.body:", req.body);
   const { product_title, amount, product_id, product_price } = req.body;
-  // console.log(
-  //   "product_title in /payment",
-  //   product_title,
-  //   "\n",
-  //   "amount in /payment:",
-  //   amount,
-  //   "\n",
-  //   "product_price in /payment:",
-  //   product_price,
-  //   "\n",
-  //   "product_id in /payment:",
-  //   product_id,
-  // );
-  if (product_title && amount && product_id !== undefined) {
+  console.log(
+    "product_title in /payment",
+    product_title,
+    "\n",
+    "amount in /payment:",
+    amount,
+    "\n",
+    "product_price in /payment:",
+    product_price,
+    "\n",
+    "product_id in /payment:",
+    product_id
+  );
+  if (
+    (product_title && amount && product_id !== undefined) ||
+    (product_title && amount && product_id !== null)
+  ) {
     const offers = await Offer.findById(product_id);
     // console.log("offers in /payment:", offers);
     // console.log("offers.product_price in /payment:", offers.product_price);
     if (product_price === Number(offers.product_price).toFixed(2)) {
-      // console.log(
-      //   "Number(offers.product_price).toFixed(2) in /payment:",
-      //   Number(offers.product_price).toFixed(2)
-      // );
-      // console.log("product_price /payment", product_price);
-      // console.log("product_price === Number(offers.product_price).toFixed(2)");
+      console.log(
+        "Number(offers.product_price).toFixed(2) in /payment:",
+        Number(offers.product_price).toFixed(2)
+      );
+      console.log("product_price /payment", product_price);
+      console.log("product_price === Number(offers.product_price).toFixed(2)");
       try {
         // const paymentMethodDomain = await stripe.paymentMethodDomains.create(
         //   {}
@@ -48,13 +52,12 @@ router.post("/payment", isAuthenticated, fileUpload(), async (req, res) => {
           amount: amount,
           currency: "eur",
           description: product_title,
-          domain_name: "https://vintaid.netlify.app/",
         });
         console.log("paymentIntent in /payment:", paymentIntent);
-        if (paymentIntent.client_secret) {
+        if (paymentIntent) {
           console.log(
             "paymentIntent.client_secret in /payment:",
-            paymentIntent.client_secret
+            paymentIntent
           );
           res.status(200).json(paymentIntent);
         } else {

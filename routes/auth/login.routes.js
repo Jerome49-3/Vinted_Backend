@@ -26,8 +26,10 @@ router.post("/login", fileUpload(), async (req, res) => {
         console.log("user in /login:", user);
         const pwdHash = SHA256(password + user.salt).toString(encBase64);
         // console.log("pwdHash:", pwdHash, "\n", "user.salt:", user.salt);
+        //if the password entered in input are the same of password record in database
         if (pwdHash === user.hash) {
           console.log("pwdHash:", pwdHash, "\n", "user.hash:", user.hash);
+          // if the becomeAdmin key in database are True (first connection)
           if (user.becomeAdmin === true) {
             console.log(
               "user.isAdmin in /login:",
@@ -39,6 +41,7 @@ router.post("/login", fileUpload(), async (req, res) => {
               "user.token in /login",
               user.token
             );
+            //I change the value of isAdmin key to true and change the value of becomeAdmin to false.
             user.isAdmin = true;
             user.becomeAdmin = false;
             const token = jwt.sign(
@@ -61,10 +64,21 @@ router.post("/login", fileUpload(), async (req, res) => {
               user.becomeAdmin
             );
             return res.status(200).json(token);
-          }
-          if ((user.isAdmin && user.becomeAdmin) === false) {
-            const token = user.token;
-            console.log("token JWT after else in /login", token);
+            // else if isAdmin and becomeAdmin are false, i send the token whithout change.
+          } else if ((user.isAdmin && user.becomeAdmin) === false) {
+            // console.log("user after else in /login:", user);
+            const token = jwt.sign(
+              {
+                _id: user.id,
+                account: user.account,
+                isAdmin: user.isAdmin,
+                newsletter: user.newsletter,
+              },
+              process.env.SRV_KEY_SECRET
+            );
+            user.token = token;
+            await user.save();
+            console.log("token JWT after else in /login:", token);
             return res.status(200).json(token);
           }
         } else {

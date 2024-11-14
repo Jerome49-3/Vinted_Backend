@@ -10,14 +10,13 @@ const User = require("../../models/User");
 router.post("/confirmemail", fileUpload(), async (req, res) => {
   console.log("je suis sur la route /confirmemail");
   const { code } = req.body;
-  console.log("code:", code);
-
-  if (code) {
-    const user = await User.findOne({ code: code });
-    console.log("code in /confirmemail:", code);
+  const codeInput = JSON.parse(code).join("");
+  if (codeInput) {
+    const user = await User.findOne({ code: codeInput });
+    console.log("codeInput in /confirmemail:", codeInput);
     console.log("user in /confirmemail:", user);
     if (user) {
-      if (code === user.code) {
+      if (codeInput === user.code) {
         const token = jwt.sign(
           {
             _id: user.id,

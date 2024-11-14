@@ -104,14 +104,14 @@ router.get("/offers", async (req, res) => {
       // console.log("newOffers in /offers:", newOffers);
       for (let i = 0; i < newOffers.length; i++) {
         const el = newOffers[i];
-        console.log("el:", el);
+        // console.log("el:", el);
         const userId = el.owner;
         // console.log("userId in /offers:", userId);
         // console.log("typeof userId in /offers:", typeof userId);
         // const userIdIsValid = mongoose.isValidObjectId(userId);
         // console.log("userIdIsValid in /offers:", userIdIsValid);
         const ownerFind = await User.findById(userId).select("account");
-        // console.log("ownerFind in for in /offers:", ownerFind);
+        console.log("ownerFind in for in /offers:", ownerFind);
         offers.push({
           _id: el._id,
           product_name: el.product_name,
@@ -146,7 +146,6 @@ router.get("/offers/:id", async (req, res) => {
       // console.log("offerId after findbyid in /offers/:id:", offerId);
       console.log("offer in /offers/:id:", offer);
       if (offer) {
-        let detailsObj = {};
         const userId = offer.owner;
         // console.log("userId in /offers/:id:", userId);
         const ownerFind = await User.findById(userId).select("account");

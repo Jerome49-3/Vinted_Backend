@@ -20,7 +20,7 @@ const confirmPayment = require("./routes/payment/confirmPayment.routes");
 const users = require("./routes/users/users");
 const transactions = require("./routes/transactions/transactions.routes");
 const usersPutDel = require("./routes/users/usersPutDel");
-const mysales = require("./routes/mysales/mysales.routes");
+const myOffers = require("./routes/myOffers/myOffers.routes");
 const mypurchases = require("./routes/mypurchases/mypurchases.routes");
 // const offerPutDel = require("./routes/offer/offerPutDel.routes");
 
@@ -36,7 +36,7 @@ app.use(confirmPayment);
 app.use(users);
 app.use(usersPutDel);
 app.use(transactions);
-app.use(mysales);
+app.use(myOffers);
 app.use(mypurchases);
 // app.use(offerPutDel);
 
