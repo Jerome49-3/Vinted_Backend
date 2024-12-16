@@ -3,7 +3,7 @@ const router = express.Router();
 const fileUpload = require("express-fileupload");
 const isAuthenticated = require("../../middleware/isAuthenticated.js");
 const stripe = require("stripe")(process.env.STRIPE_KEY_SECRET);
-const moment = require("moment/moment.js");
+// const moment = require("moment/moment.js");
 
 //models
 const User = require("../../models/User.js");

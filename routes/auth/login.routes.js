@@ -6,6 +6,7 @@ const fileUpload = require("express-fileupload");
 const CryptoJS = require("crypto-js");
 const { message } = require("statuses");
 const jwt = require("jsonwebtoken");
+const passwordValidator = require("../../utils/passwordValidation");
 
 //models
 
@@ -14,6 +15,7 @@ const User = require("../../models/User");
 router.post("/login", fileUpload(), async (req, res) => {
   console.log("je suis sur la route /login");
   try {
+    passwordValidator(password);
     const { password, email } = req.body;
     if (
       password !== undefined &&

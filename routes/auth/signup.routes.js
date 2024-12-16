@@ -9,16 +9,19 @@ const CryptoJS = require("crypto-js");
 // const bcrypt = require('bcrypt');
 // const saltRounds = 16;
 const jwt = require("jsonwebtoken");
-const Mailgun = require("mailgun.js");
-const formData = require("form-data");
+// const Mailgun = require("mailgun.js");
+// const formData = require("form-data");
 const generateCode = require("../../utils/generateCode");
+const { Resend } = require("resend");
+// console.log("resend:", Resend);
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 //config mailgun
-const mailgun = new Mailgun(formData);
-const mgClient = mailgun.client({
-  username: process.env.MAILGUN_USERNAME,
-  key: process.env.MAILGUN_API_KEY,
-});
+// const mailgun = new Mailgun(formData);
+// const mgClient = mailgun.client({
+//   username: process.env.MAILGUN_USERNAME,
+//   key: process.env.MAILGUN_API_KEY,
+// });
 
 //models
 const User = require("../../models/User");
@@ -26,19 +29,19 @@ const User = require("../../models/User");
 router.post("/signup", fileUpload(), async (req, res) => {
   console.log("je suis sur la route /signup");
   const { password, username, email, newsletter } = req.body;
-  // console.log(
-  //   "password in signup:",
-  //   password,
-  //   "\n",
-  //   "username in signup:",
-  //   username,
-  //   "\n",
-  //   "email in signup:",
-  //   email,
-  //   "\n",
-  //   "newsletter in signup:",
-  //   newsletter
-  // );
+  console.log(
+    "password in signup:",
+    password,
+    "\n",
+    "username in signup:",
+    username,
+    "\n",
+    "email in signup:",
+    email,
+    "\n",
+    "newsletter in signup:",
+    newsletter
+  );
   //si le champ username est vide, renvoyer un status Http400
   if (username.length === 0) {
     return res
@@ -48,7 +51,7 @@ router.post("/signup", fileUpload(), async (req, res) => {
   //si le mot de passe est differend d'undefined
   if (password !== undefined && email !== undefined) {
     const userfindWithEmail = await User.findOne({ email: email });
-    // console.log("userfindWithEmail in signup:", userfindWithEmail);
+    console.log("userfindWithEmail in signup:", userfindWithEmail);
     if (userfindWithEmail) {
       return res
         .status(400)
@@ -99,7 +102,8 @@ router.post("/signup", fileUpload(), async (req, res) => {
               console.log("typeof code in /signup:", typeof code);
               newUser.code = code;
               await newUser.save();
-              const admin = `The negociator or The Tibo`;
+              console.log("newUser.code in /signup:", newUser.code);
+              const admin = `Vintaid team`;
               const subject = "Welcome to Vintaid, my replica of Vinted";
               const message = `Welcome ${username}, Here your code: ${code}, copy him and tape it at input for verifying your email, please`;
               const messageHtml = `
@@ -107,22 +111,30 @@ router.post("/signup", fileUpload(), async (req, res) => {
                   <p>Welcome ${username}, Here your code: ${code}, copy him and tape it at input for verifying your email, please</p>
                   <br>
                   <p>Best regards,</p>
-                  <p><strong>${admin}, The Vintaid Administrator has never tord ^_^ </strong></p>`;
-
-              const response = await mgClient.messages.create(
-                process.env.MAILGUN_SANDBOX,
-                {
-                  from: process.env.EMAIL_TO_ME,
-                  to: `${username} <${email}>`,
-                  subject: subject,
-                  text: message,
-                  html: messageHtml,
-                }
-              );
-              console.log("responseMailgun on /signup:", response);
-              return res.status(200).json({
-                data: "Merci de confirmer votre email, en entrant le code recu par mail, possiblement dans vos spams ^_^",
+                  <strong>${admin}</strong>`;
+              // const response = await mgClient.messages.create(
+              //   process.env.MAILGUN_SANDBOX,
+              //   {
+              //     from: process.env.EMAIL_TO_ME,
+              //     to: `${username} <${email}>`,
+              //     subject: subject,
+              //     text: message,
+              //     html: messageHtml,
+              //   }
+              // );
+              const emailSend = await resend.emails.send({
+                from: process.env.EMAIL_TO_ME,
+                to: `${username} <${email}>`,
+                subject: subject,
+                text: message,
+                html: messageHtml,
               });
+              console.log("emailSend on /signup:", emailSend);
+              return res
+                .status(200)
+                .json(
+                  "Merci de confirmer votre email, en entrant le code recu par mail, possiblement dans vos spams ou promotions ^_^"
+                );
             }
           } else {
             return res
