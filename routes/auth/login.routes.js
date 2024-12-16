@@ -15,7 +15,6 @@ const User = require("../../models/User");
 router.post("/login", fileUpload(), async (req, res) => {
   console.log("je suis sur la route /login");
   try {
-    passwordValidator(password);
     const { password, email } = req.body;
     if (
       password !== undefined &&
@@ -23,6 +22,7 @@ router.post("/login", fileUpload(), async (req, res) => {
       email !== undefined &&
       email !== null
     ) {
+      // passwordValidator(password);
       const user = await User.findOne({ email: email });
       if (user) {
         console.log("user in /login:", user);
